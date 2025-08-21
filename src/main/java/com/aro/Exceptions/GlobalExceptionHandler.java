@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         log.error("Database error", ex);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse("DATABASE_ERROR", "Unable to save product", LocalDateTime.now().toString()));
+            .body(new ErrorResponse("DATABASE_ERROR", ex.getMessage(), LocalDateTime.now().toString()));
     }
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException e) {

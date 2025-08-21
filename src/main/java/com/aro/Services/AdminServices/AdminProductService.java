@@ -1,6 +1,7 @@
 package com.aro.Services.AdminServices;
 
 import com.aro.DTOs.ProductsDto;
+import com.aro.Entity.OrderProduct;
 import com.aro.Entity.Products;
 import com.aro.Exceptions.ProductNotFoundException;
 import com.aro.Exceptions.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,13 +55,15 @@ public class AdminProductService {
         return ResponseEntity.ok(savedProduct);
     }
 
+    // instead of doing the hard delete we could do soft delete
     @Transactional
     public ResponseEntity<?> deleteProduct(Long productId) {
+        // now how will i be able to delete
         Products productToDelete = productsRepo.findById(productId).orElseThrow(
             ProductNotFoundException::new
         );
-
-        productsRepo.delete(productToDelete);
+        productToDelete.setDeleted(true);
+        productsRepo.save(productToDelete);
         log.info("Product deleted Successfully...");
         return ResponseEntity.ok().body(productToDelete);
     }

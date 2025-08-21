@@ -47,6 +47,9 @@ public class Products {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
     private Set<ProductVariant> productVariants;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = false;
+
     // Constructor for required fields
     public Products(String name, BigDecimal price, String description, String category,
                     String color, String imgPath) {
