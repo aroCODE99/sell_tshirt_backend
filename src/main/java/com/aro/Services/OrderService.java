@@ -103,7 +103,8 @@ public class OrderService {
         }
 
         saveThisOrder.setTotalAmount(totalAmount);
-        return ordersRepo.save(saveThisOrder);
+        var savedOrder = ordersRepo.save(saveThisOrder);
+        return savedOrder;
     }
 
     public ResponseEntity<Set<Orders>> getOrders(String authHeader) {
@@ -113,6 +114,10 @@ public class OrderService {
             () -> new UsernameNotFoundException("User not in the database")
         );
         return ResponseEntity.ok().body(user.getOrders());
+    }
+
+    public ResponseEntity<?> getOrderById(Long id) {
+        return ResponseEntity.ok(ordersRepo.findById(id));
     }
 
     public ResponseEntity<?> getRecentOrder(String authHeader) {

@@ -20,6 +20,12 @@ public class OrdersController {
         return orderService.getOrders(authHeader);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrders(@PathVariable("id") Long id) {
+        return orderService.getOrderById(id);
+    }
+
+
     @PostMapping("/placeOrder")
     public ResponseEntity<?> placeOrder(@RequestHeader("Authorization") String authHeader) throws EmptyCartException {
         return orderService.placeOrder(authHeader);

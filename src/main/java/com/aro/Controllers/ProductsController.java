@@ -25,11 +25,6 @@ public class ProductsController {
         return productsService.getAllProducts();
     }
 
-    @PostMapping
-    public ResponseEntity<?> createProduct(@ModelAttribute ProductsDto dto) throws IOException {
-        return productsService.createProduct(dto);
-    }
-
     @GetMapping("/getAllCategories")
     public List<Category> getAllCategories() {
         return productsService.getAllCategories();

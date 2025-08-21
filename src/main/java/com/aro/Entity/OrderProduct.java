@@ -7,19 +7,19 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @ToString(exclude = "product")
 public class OrderProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ToString.Exclude
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Orders order;
 
+    // this references the product // i could do something like create the
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Products product;

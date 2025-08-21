@@ -15,11 +15,11 @@ public class ProductsMapper {
 
     public static Products toEntity(ProductsDto dto) {
         Products product = new Products();
-        product.setCategory(new Category(dto.getCategoryType()));
+        product.setCategory(dto.getCategoryType());
         product.setColor(dto.getColor());
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
-        product.setPrice(BigDecimal.valueOf(Long.parseLong(dto.getPrice())));
+        product.setPrice(BigDecimal.valueOf(dto.getPrice()));
 
         product.setProductVariants(dto.getSizes().stream()
             .map((s) -> new ProductVariant(product, Size.valueOf(s), 50))

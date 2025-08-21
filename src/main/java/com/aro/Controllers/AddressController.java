@@ -22,7 +22,6 @@ public class AddressController {
 
     @PostMapping
     public ResponseEntity<?> saveAddress(@RequestBody AddressDto addressDto, @RequestHeader("Authorization") String authHeader) {
-        System.out.println(addressDto);
         return userService.saveAddress(addressDto, authHeader);
     }
 }

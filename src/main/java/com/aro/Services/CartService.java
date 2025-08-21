@@ -1,6 +1,7 @@
 package com.aro.Services;
 
 import com.aro.DTOs.AddToCartDto;
+import com.aro.DTOs.ErrorResponse;
 import com.aro.DTOs.SuccessResponse;
 import com.aro.Entity.Cart;
 import com.aro.Entity.CartProduct;
@@ -12,6 +13,7 @@ import com.aro.Repos.CartRepo;
 import com.aro.Repos.ProductsRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,10 +73,15 @@ public class CartService {
     }
 
     public ResponseEntity<?> getCart(String token) {
-        Long userId = jwtService.getUserId(token);
+        try {
+            Long userId = jwtService.getUserId(token);
 
-        Cart cart = cartRepo.findByUserId(userId);
-        return ResponseEntity.ok().body(cart);
+            Cart cart = cartRepo.findByUserId(userId);
+            return ResponseEntity.ok().body(cart);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("UNAUTHORIZED", "Require the jwtToken",
+                LocalDateTime.now().toString()));
+        }
     }
 
     @Transactional

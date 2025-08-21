@@ -13,8 +13,8 @@ public class CartProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ToString.Exclude
     @JsonBackReference
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;

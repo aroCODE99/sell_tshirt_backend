@@ -29,48 +29,13 @@ public class ProductsService {
 
     private final CategoryRepo categoryRepo;
 
-    private final Cloudinary cloudinary;
-
-    public ProductsService(ProductsRepo productsRepo, CategoryRepo categoryRepo, Cloudinary cloudinary) {
+    public ProductsService(ProductsRepo productsRepo, CategoryRepo categoryRepo) {
         this.productsRepo = productsRepo;
         this.categoryRepo = categoryRepo;
-        this.cloudinary = cloudinary;
     }
 
     public List<Products> getAllProducts() {
         return productsRepo.findAll();
-    }
-
-    @Transactional
-    public ResponseEntity<?> createProduct(ProductsDto dto) throws IOException {
-        Products products = ProductsMapper.toEntity(dto);
-
-        if (dto.getImgUrl() != null && !dto.getImgUrl().isEmpty()) {
-            // Validate before upload (size/type) – see below
-            String publicId = "products/" + UUID.randomUUID();
-
-            // this need the checking of the path
-            Map<?, ?> res;
-            try (InputStream in = dto.getImgUrl().getInputStream()) {
-                res = cloudinary.uploader().upload(
-                    in,
-                    ObjectUtils.asMap(
-                        "public_id", publicId,
-                        "resource_type", "auto", // auto-detect image/video
-                        "folder", "products"     // optional, if you prefer grouping
-                    )
-                );
-            } catch (IOException e) {
-                throw new FileUploadException("Failed to upload to Cloudinary", e);
-            }
-
-            // Prefer secure_url over url
-            String secureUrl = String.valueOf(res.get("secure_url"));
-            products.setImgPath(secureUrl);
-            products.setCloudinaryPublicId(String.valueOf(res.get("public_id")));
-        }
-
-        return ResponseEntity.ok().body(productsRepo.save(products));
     }
 
     public List<Category> getAllCategories() {

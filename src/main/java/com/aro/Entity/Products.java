@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,9 +29,8 @@ public class Products {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @Column
+    private String category;
 
     @Column(nullable = false)
     private String imgPath;
@@ -43,14 +41,14 @@ public class Products {
     @Column(nullable = false)
     private String color;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    private Set<ProductVariant> productVariants;
-
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isFeatured = false;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<ProductVariant> productVariants;
+
     // Constructor for required fields
-    public Products(String name, BigDecimal price, String description, Category category,
+    public Products(String name, BigDecimal price, String description, String category,
                     String color, String imgPath) {
         this.name = name;
         this.price = price;
@@ -61,12 +59,11 @@ public class Products {
     }
 
     // Constructor for required fields
-    public Products(String name, BigDecimal price, String description, Category category,
+    public Products(String name, BigDecimal price, String description, String category,
                     String color, String imgPath, Set<ProductVariant> productVariants) {
         this.name = name;
         this.price = price;
         this.description = description;
-        this.category = category;
         this.color = color;
         this.imgPath = imgPath;
         this.productVariants = productVariants;

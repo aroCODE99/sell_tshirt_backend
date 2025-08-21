@@ -21,7 +21,6 @@ public class CartController {
 
     @PostMapping("/addToCart")
     public ResponseEntity<?> addToCart(@RequestHeader("Authorization") String authHeader, @RequestBody AddToCartDto addToCartDto) {
-        System.out.println(addToCartDto);
         return cartService.addToCart(addToCartDto, authHeader);
     }
 

@@ -3,9 +3,7 @@ package com.aro;
 import com.aro.Entity.*;
 import com.aro.Enums.Categories;
 import com.aro.Enums.Size;
-import com.aro.Repos.AuthRepo;
 import com.aro.Repos.CategoryRepo;
-import com.aro.Repos.OrdersRepo;
 import com.aro.Repos.ProductsRepo;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,12 +34,12 @@ public class SellingTOnlineApplication {
 
 		Products tShirt = new Products(
 			"Solo-leveling t-shirt",
-			new BigDecimal(599),
+			new BigDecimal(59),
 			"""
                 FIT TYPE: Oversized Fit; Main material: 100% Cotton , 180GSM (Bio-Washed & Pre-Shrunk for Minimum shrinkage).
                 HIGH DEFINITION PRINT: We are using the High Quality Print Technology to ensure our products with sharp cuts and durable for long time.
             """,
-			category,
+			"Something",
 			"Black",
 			"http://demopath.com"
 		);

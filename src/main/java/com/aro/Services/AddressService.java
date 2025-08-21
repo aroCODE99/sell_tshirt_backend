@@ -46,6 +46,7 @@ public class AddressService {
     public ResponseEntity<?> saveAddress(AddressDto addressDto, String authHeader) {
         Long userId = jwtService.getUserId(authHeader);
 
+        // we first get the user
         AppUsers user = authRepo.findById(userId).orElseThrow(
             () -> new UsernameNotFoundException("user not in db")
         );
@@ -60,7 +61,8 @@ public class AddressService {
 
             return ResponseEntity.ok().body(authRepo.save(user));
         }  else {
-            return ResponseEntity.badRequest().body(new ErrorResponse("ALREADY_"+addressDto.getAddressType()+"ADDRESS EXISTS", "address already there",
+            return ResponseEntity.badRequest().body(new ErrorResponse(
+                "ALREADY_"+addressDto.getAddressType()+"ADDRESS EXISTS", "address already there",
                 LocalDateTime.now().toString()));
         }
     }

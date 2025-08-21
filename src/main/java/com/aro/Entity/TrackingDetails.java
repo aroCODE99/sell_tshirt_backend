@@ -19,7 +19,8 @@ public class TrackingDetails {
     @JoinColumn(name = "order_id")
     private Orders orders;
 
-    @OneToOne
+    // now the thing is that One address can be in multiple tracking_details
+    @ManyToOne
     @JoinColumn(name = "address_id")
     private Addresses addresses;
 }

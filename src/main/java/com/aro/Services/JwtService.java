@@ -9,13 +9,17 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
@@ -42,9 +46,13 @@ public class JwtService {
     }
 
     public String generateToken(AppUsers user) {
+        Collection<? super GrantedAuthority> authorities = user.getUserRoles().stream().map(role ->
+            new SimpleGrantedAuthority(role.getRoleName())
+        ).collect(Collectors.toSet());
+
         return Jwts.builder()
             .claim("user_id", user.getId())
-            .claim("roles", user.getUserRoles())
+            .claim("roles", authorities)
             .claim("username", user.getUsername())
             .setSubject(user.getEmail())
             .setIssuedAt(new Date())
