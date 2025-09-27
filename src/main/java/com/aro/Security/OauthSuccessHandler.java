@@ -1,9 +1,7 @@
 package com.aro.Security;
 
 import com.aro.DTOs.RegisterDto;
-import com.aro.Entity.AppUsers;
-import com.aro.Entity.RefreshToken;
-import com.aro.Entity.Roles;
+import com.aro.Entity.*;
 import com.aro.Enums.RoleNames;
 import com.aro.Repos.AuthRepo;
 import com.aro.Repos.RoleRepo;
@@ -16,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -42,6 +41,9 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
 
     private final AuthRepo authRepo;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     public OauthSuccessHandler(RefreshTokenService refreshTokenService, JwtService jwtService, CustomUserDetailsService userDetailsService, RoleRepo roleRepo, AuthRepo authRepo) {
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
@@ -66,17 +68,20 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
             userDetails = userDetailsService.loadUserByUsername(email);
         } catch (Exception e) {
             // does this just registers the use
-            log.error("User Not Found {}", e.getMessage());
+            log.info("User Not Found {}", e.getMessage());
 
             // this all happens synchronously but TO OCCUR ASYNC WE COULD USE THE @aSYNC ANNOTATION ON THE ENTITY
             Set<Roles> userRoles = Set.of(roleRepo.findByRoleName(RoleNames.USER.name()).orElseThrow(
                 () -> new EntityNotFoundException("User Role not found")
             ));
 
-            authRepo.save(new AppUsers(
-                email, null, username, oauthProvider, userRoles
-            ));
+            AppUsers userToSave = new AppUsers(
+                email, username, null, userRoles
+            );
+            userToSave.addCart(new Cart());
+            userToSave.addWishList(new WishList());
 
+            authRepo.save(userToSave);
             userDetails = userDetailsService.loadUserByUsername(email);
         }
 
@@ -84,7 +89,7 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
             String jwtAccessToken = jwtService.generateToken(userDetails);
 
             // ✅ Correct Set-Cookie header
-            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+            ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken.getToken())
                 .secure(false) // true in production
                 .httpOnly(true)
                 .path("/")
@@ -94,7 +99,7 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
             response.addHeader("Set-Cookie", cookie.toString());
 
             // ✅ Send JWT access token to frontend
-            String frontendRedirectUrl = "http://localhost:8080/auth/hello?token=" + jwtAccessToken;
+            String frontendRedirectUrl = frontendUrl+"/oauth/redirect?token=" + jwtAccessToken;
             response.sendRedirect(frontendRedirectUrl);
         }
 

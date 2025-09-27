@@ -35,8 +35,7 @@ public class AppUsers {
     @Column(name = "oauth_provider")
     private String oauthProvider;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
+    @ManyToMany(fetch = FetchType.EAGER) @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")

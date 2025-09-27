@@ -99,11 +99,20 @@ public class GlobalExceptionHandler {
             new ErrorResponse("MISSING_AUTHORIZATION_HEADER", e.getMessage(), LocalDateTime.now().toString())
         );
     }
+
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredJwtException e) {
         log.error("JWT_EXPIRED {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
             new ErrorResponse("JWT_EXPIRED", e.getMessage(), LocalDateTime.now().toString())
+        );
+    }
+
+    @ExceptionHandler(ProductSizeError.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(ProductSizeError e) {
+        log.error("PRODUCT_SIZE_ERROR {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+            new ErrorResponse("PRODUCT_SIZE_ERROR", e.getMessage(), LocalDateTime.now().toString())
         );
     }
 

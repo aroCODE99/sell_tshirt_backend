@@ -1,6 +1,5 @@
 package com.aro.Entity;
 
-import com.aro.Enums.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
@@ -20,22 +19,20 @@ public class ProductVariant {
 
     // now i don't think this is going to be the string
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Size size; // this is main thing
+    private String size; // this is main thing
 
     @Column(nullable = false)
     private int quantity; // this is not quantity as in product quantity this product stock
 
-    public ProductVariant(Size size, int quantity) {
+    public ProductVariant(String size, int quantity) {
         this.size = size;
         this.quantity = quantity;
     }
 
-    public ProductVariant(Products product, Size size, int quantity) {
+    public ProductVariant(Products product, String size, int quantity) {
         this.product = product;
         this.size = size;
         this.quantity = quantity;
     }
-
 
 }

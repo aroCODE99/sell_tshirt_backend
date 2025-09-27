@@ -2,11 +2,11 @@ package com.aro.Services;
 
 import com.aro.DTOs.PaymentCallbackDto;
 import com.aro.Entity.*;
+import com.aro.Enums.OrderStatus;
 import com.aro.Enums.PaymentStatus;
+import com.aro.Enums.PaymentType;
 import com.aro.Repos.AuthRepo;
 import com.aro.Repos.OrdersRepo;
-import com.aro.Repos.PaymentsRepo;
-import com.nimbusds.openid.connect.sdk.claims.Address;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -32,12 +31,16 @@ public class PaymentsService {
 
     private final AuthRepo authRepo;
     private final OrdersRepo ordersRepo;
-    private final PaymentsRepo paymentsRepo;
 
-    public PaymentsService(AuthRepo authRepo, OrdersRepo ordersRepo, PaymentsRepo paymentsRepo) {
+    @Value("${delivery.fee}")
+    private Long deliveryFee;
+
+    @Value("${convenience.fee}")
+    private Long convenienceFee;
+
+    public PaymentsService(AuthRepo authRepo, OrdersRepo ordersRepo) {
         this.authRepo = authRepo;
         this.ordersRepo = ordersRepo;
-        this.paymentsRepo = paymentsRepo;
     }
 
     public String createOrder(int amount) throws RazorpayException {
@@ -79,30 +82,36 @@ public class PaymentsService {
             Payments payment = new Payments();
             payment.setRazorPaymentId(razorpayPaymentId);
             payment.setRazorOrderId(razorpayOrderId);
-            payment.setAmount(orders.getTotalAmount().add(BigDecimal.valueOf(99 + 50 + 99)));
+            payment.setAmount(orders.getTotalAmount().add(BigDecimal.valueOf(deliveryFee + convenienceFee)));
             payment.setStatus(PaymentStatus.SUCCESS);
-            payment.setMethod("ONLINE");
+            payment.setMethod(PaymentType.ONLINE.name());
             payment.setOrder(orders);
 
             user.addPayment(payment);
             authRepo.save(user);
 
-            TrackingDetails trackingDetails = new TrackingDetails();
-            trackingDetails.setStatus("PENDING");
-            trackingDetails.setAddresses(selectedAddress);
-            orders.addTrackingDetails(trackingDetails);
+            TrackingDetails trackingDetails = orders.getTrackingDetails();
 
+            if (trackingDetails == null) {
+                trackingDetails = new TrackingDetails();
+                trackingDetails.setStatus(OrderStatus.ORDER_PLACED.name());
+                trackingDetails.setAddresses(selectedAddress);
+                orders.addTrackingDetails(trackingDetails);
+            }
+
+            trackingDetails.setStatus(OrderStatus.ORDER_PLACED.name());
+            trackingDetails.setAddresses(selectedAddress);
             ordersRepo.save(orders);
 
             return true;
         } else {
-
+            // payment failed
             Payments payment = new Payments();
             payment.setRazorPaymentId(razorpayPaymentId);
             payment.setRazorOrderId(razorpayOrderId);
-            payment.setAmount(orders.getTotalAmount().add(BigDecimal.valueOf(99 + 50 + 99)));
+            payment.setAmount(orders.getTotalAmount().add(BigDecimal.valueOf(deliveryFee + convenienceFee)));
             payment.setStatus(PaymentStatus.FAILED);
-            payment.setMethod("ONLINE");
+            payment.setMethod(PaymentType.ONLINE.name());
             payment.setOrder(orders);
 
             user.addPayment(payment);
