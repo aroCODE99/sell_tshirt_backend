@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  selling_tshirt_db:
+    image: mysql:latest
+    ports:
+      - "5000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sell_tshirt
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10  # increase retries to give DB more time to initialize
+
+  selling_tshirt:
+    build: ./
+    image: selltshirt_online:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      selling_tshirt_db:
+        condition: service_healthy  # wait until DB healthcheck passes
+    environment:
+      SPRING_APPLICATION_NAME: SellingTOnline
+      SPRING_DATASOURCE_URL: jdbc:mysql://selling_tshirt_db:3306/sell_tshirt
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
+      SPRING_SECURITY_USER_NAME: root
+      SPRING_SECURITY_USER_PASSWORD: root
+      JWT_SECRET: kebF4y3D/aKJsQ9SFeXa1jd5d2My0uimBKQQi3fT6N22VZd6Ffr3LIyLd9ByyVNCqmYPfUKJ6CUZu434jjR9aw==
+      FRONTEND_URL: http://localhost:5173
+      RAZOR_KEY_ID: rzp_test_R5xP5ynQR0L8Ih
+      RAZOR_KEY_SECRET: 3FXizxIUsFYVHimEUH4xzglD
+      CLOUDINARY_URL: cloudinary://684846989412647:bqnM-BaFuVi-WKCYBHm27oSnS80@dxnymxxnf
+      SPRING_SERVLET_MULTIPART_ENABLED: "true"
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 10MB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 10MB
+      DELIVERY_FEE: "99"
+      CONVENIENCE_FEE: "20"
+

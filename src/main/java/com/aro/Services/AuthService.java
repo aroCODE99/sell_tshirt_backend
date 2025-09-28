@@ -72,10 +72,18 @@ public class AuthService {
         // Encode password only
         user.setPassword(passwordEncoder.encode(user.getPassword().strip()));
 
-        Set<Roles> userRoles = Set.of(roleRepo.findByRoleName(RoleNames.USER.name()).orElseThrow(
-            () -> new EntityNotFoundException("User Role not found")
-        ));
-
+        Set<Roles> userRoles = new HashSet<>(
+            Collections.singleton(
+                roleRepo.findByRoleName(RoleNames.USER.name())
+                    .orElseThrow(() -> new EntityNotFoundException("User Role not found"))
+            )
+        );
+        if (user.getRole() != null) {
+            userRoles.add(roleRepo.findByRoleName(user.getRole().name())
+                .orElseThrow(() -> new EntityNotFoundException("User Role not found")
+                )
+            );
+        }
         try {
             // now to initialize the cart
             AppUsers userToSave = new AppUsers(user.getEmail(), user.getUsername(), user.getPassword(), userRoles);

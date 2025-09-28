@@ -1,6 +1,12 @@
 package com.aro;
 
-import com.aro.Services.CloudinaryService;
+import com.aro.DTOs.RegisterDto;
+import com.aro.Entity.AppUsers;
+import com.aro.Entity.Roles;
+import com.aro.Enums.RoleNames;
+import com.aro.Repos.AuthRepo;
+import com.aro.Repos.RoleRepo;
+import com.aro.Services.AuthService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,9 +22,28 @@ public class SellingTOnlineApplication {
 	}
 
 	@Bean
-	public CommandLineRunner commandLineRunner(CloudinaryService cloudinaryService) {
+	public CommandLineRunner commandLineRunner(AuthRepo authRepo, AuthService authService,
+											   RoleRepo roleRepo) {
 		return args -> {
-			System.out.println("Application started .....");
+            if (!roleRepo.existsByRoleName(RoleNames.USER.name()) && !roleRepo.existsByRoleName(RoleNames.ADMIN.name())) {
+                Roles user = new Roles();
+                user.setRoleName(RoleNames.USER.name());
+                Roles admin = new Roles();
+                admin.setRoleName(RoleNames.ADMIN.name());
+                roleRepo.save(user);
+                roleRepo.save(admin);
+            }
+
+			if (!authRepo.existsByEmail("test@gmail.com")) {
+				RegisterDto dto = new RegisterDto();
+				dto.setUsername("test");
+				dto.setEmail("test@gmail.com");
+				dto.setPassword("test");
+				dto.setOauthProvider(null);
+				dto.setRole(RoleNames.ADMIN);
+				authService.register(dto);
+			}
+			System.out.println("AuthService started ...");
 		};
 	}
 

@@ -94,12 +94,12 @@ public class PaymentsService {
 
             if (trackingDetails == null) {
                 trackingDetails = new TrackingDetails();
-                trackingDetails.setStatus(OrderStatus.ORDER_PLACED.name());
+                trackingDetails.setStatus(OrderStatus.ORDER_CONFIRMED.name());
                 trackingDetails.setAddresses(selectedAddress);
                 orders.addTrackingDetails(trackingDetails);
             }
 
-            trackingDetails.setStatus(OrderStatus.ORDER_PLACED.name());
+            trackingDetails.setStatus(OrderStatus.ORDER_CONFIRMED.name());
             trackingDetails.setAddresses(selectedAddress);
             ordersRepo.save(orders);
 
