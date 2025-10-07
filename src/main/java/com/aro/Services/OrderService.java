@@ -74,7 +74,7 @@ public class OrderService {
         Orders saveThisOrder = new Orders();
         saveThisOrder.setUser(user);
 
-        BigDecimal priceAtPurchase = products.getPrice();
+        BigDecimal priceAtPurchase = products.getDiscountedPrice();
         OrderProduct op = new OrderProduct(saveThisOrder, products, orderDto.getQuantity(), priceAtPurchase, orderDto.getSize());
         saveThisOrder.addOrderProduct(op);
         saveThisOrder.setTotalAmount(priceAtPurchase); // as it has only one product
@@ -100,7 +100,7 @@ public class OrderService {
                 throw new ProductSizeError("Quantity is low");
             }
 
-            BigDecimal priceAtPurchase = cp.getProduct().getPrice();
+            BigDecimal priceAtPurchase = cp.getProduct().getDiscountedPrice();
             OrderProduct op = new OrderProduct(saveThisOrder, cp.getProduct(), cp.getQuantity(), priceAtPurchase, cp.getSize());
             saveThisOrder.addOrderProduct(op);
             totalAmount = totalAmount.add(priceAtPurchase.multiply(BigDecimal.valueOf(cp.getQuantity())));
